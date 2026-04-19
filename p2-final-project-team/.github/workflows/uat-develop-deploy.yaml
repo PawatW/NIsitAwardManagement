@@ -1,0 +1,52 @@
+name: UAT - Build & Deploy Frontend
+
+on:
+  push:
+    branches: [ "develop" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: uat-frontend-develop
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: self-hosted
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.TOKEN_SECRET }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          IMAGE=ghcr.io/472-68-agiledevops/p2-final-project-team
+          SHA_TAG=uat-${{ github.sha }}
+          ENV_TAG=uat
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=https://uat.api.k8s.dev \
+            -t $IMAGE:$SHA_TAG \
+            -t $IMAGE:$ENV_TAG .
+
+      - name: Push image
+        run: |
+          IMAGE=ghcr.io/472-68-agiledevops/p2-final-project-team
+          SHA_TAG=uat-${{ github.sha }}
+          ENV_TAG=uat
+          docker push $IMAGE:$SHA_TAG
+          docker push $IMAGE:$ENV_TAG
+
+      - name: Deploy to UAT
+        run: |
+          IMAGE=ghcr.io/472-68-agiledevops/p2-final-project-team
+          ENV_TAG=uat
+          kubectl set image deployment/frontend frontend=$IMAGE:$ENV_TAG
+          kubectl rollout status deployment/frontend

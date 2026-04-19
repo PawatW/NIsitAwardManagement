@@ -1,0 +1,982 @@
+'use client'
+
+import { useState } from 'react'
+import { 
+  Search,
+  Settings as SettingsIcon,
+  Menu,
+  Edit,
+  History,
+  User as UserIcon,
+  UserPlus,
+  Check,
+  X,
+  FileCheck,
+  Activity,
+  CheckCircle,
+  AlertCircle,
+  Users as UsersIcon,
+  Briefcase,
+  ClipboardList,
+  Trash2,
+  type LucideIcon
+} from 'lucide-react'
+import '../../styles/users.css'
+
+interface User {
+  id: number
+  name: string
+  email: string
+  role: string
+  roleColor: string
+  faculty: string
+  department: string
+  campus: string
+  status: string
+  statusColor: string
+  avatar: string
+}
+
+interface NewUserData {
+  name: string
+  email: string
+  role: string
+  faculty: string
+  department: string
+  campus: string
+}
+
+export default function Users() {
+  const [activeTab, setActiveTab] = useState<string>('All Users');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
+  const [showAddUserModal, setShowAddUserModal] = useState<boolean>(false);
+  const [newUserData, setNewUserData] = useState<NewUserData>({
+    name: '',
+    email: '',
+    role: 'Student',
+    faculty: '',
+    department: '',
+    campus: 'Bangkhen'
+  });
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showHistoryModal, setShowHistoryModal] = useState<boolean>(false);
+  const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
+  const [showViewOptions, setShowViewOptions] = useState<boolean>(false);
+
+  const tabs = ['All Users', 'Students', 'Faculty', 'Staff', 'Committee'];
+
+  interface StatData {
+    label: string
+    value: string
+    change: string
+    changeType: string
+    IconComponent: LucideIcon
+    iconBg: string
+  }
+
+  const statsData: StatData[] = [
+    {
+      label: 'Total Users',
+      value: '1,284',
+      change: '+5% FROM LAST MONTH',
+      changeType: 'positive',
+      IconComponent: UsersIcon,
+      iconBg: 'rgba(34, 197, 94, 0.15)'  // Green
+    },
+    {
+      label: 'Active Committee',
+      value: '24',
+      change: 'NO CHANGE',
+      changeType: 'neutral',
+      IconComponent: Briefcase,
+      iconBg: 'rgba(59, 130, 246, 0.15)'  // Blue
+    },
+    {
+      label: 'Pending Approvals',
+      value: '45',
+      change: '+12% INCREASED',
+      changeType: 'warning',
+      IconComponent: ClipboardList,
+      iconBg: 'rgba(245, 158, 11, 0.15)'  // Orange
+    }
+  ];
+
+  const usersData = [
+    {
+      id: 1,
+      name: 'Somchai Rakdee',
+      email: 'somchai@ku.th',
+      role: 'Student',
+      roleColor: '#3b82f6',
+      department: 'Faculty of Engineering',
+      status: 'Active',
+      statusColor: '#22c55e',
+      avatar: 'https://ui-avatars.com/api/?name=Somchai+Rakdee&background=3b82f6&color=fff'
+    },
+    {
+      id: 2,
+      name: 'Prof. Prapas Chon',
+      email: 'prapas.c@ku.th',
+      role: 'Committee',
+      roleColor: '#a855f7',
+      department: 'Office of the Registrar',
+      status: 'Active',
+      statusColor: '#22c55e',
+      avatar: 'https://ui-avatars.com/api/?name=Prapas+Chon&background=a855f7&color=fff'
+    },
+    {
+      id: 3,
+      name: 'Nattapong Suwan',
+      email: 'nattapong.s@ku.th',
+      role: 'Staff',
+      roleColor: '#64748b',
+      department: 'Student Affairs',
+      status: 'Inactive',
+      statusColor: '#94a3b8',
+      avatar: 'https://ui-avatars.com/api/?name=Nattapong+Suwan&background=64748b&color=fff'
+    },
+    {
+      id: 4,
+      name: 'Kanok Porn',
+      email: 'kanok.p@ku.th',
+      role: 'Faculty',
+      roleColor: '#f59e0b',
+      department: 'Faculty of Science',
+      status: 'Active',
+      statusColor: '#22c55e',
+      avatar: 'https://ui-avatars.com/api/?name=Kanok+Porn&background=f59e0b&color=fff'
+    },
+    {
+      id: 5,
+      name: 'Siriporn Kaew',
+      email: 'siriporn.k@ku.th',
+      role: 'Student',
+      roleColor: '#3b82f6',
+      department: 'Faculty of Arts',
+      status: 'Active',
+      statusColor: '#22c55e',
+      avatar: 'https://ui-avatars.com/api/?name=Siriporn+Kaew&background=3b82f6&color=fff'
+    },
+    {
+      id: 6,
+      name: 'Wichai Tanaka',
+      email: 'wichai.t@ku.th',
+      role: 'Faculty',
+      roleColor: '#f59e0b',
+      department: 'Faculty of Medicine',
+      status: 'Active',
+      statusColor: '#22c55e',
+      avatar: 'https://ui-avatars.com/api/?name=Wichai+Tanaka&background=f59e0b&color=fff'
+    },
+    {
+      id: 7,
+      name: 'Apinya Somjai',
+      email: 'apinya.s@ku.th',
+      role: 'Committee',
+      roleColor: '#a855f7',
+      department: 'Academic Affairs',
+      status: 'Active',
+      statusColor: '#22c55e',
+      avatar: 'https://ui-avatars.com/api/?name=Apinya+Somjai&background=a855f7&color=fff'
+    },
+    {
+      id: 8,
+      name: 'Thawatchai Lee',
+      email: 'thawatchai.l@ku.th',
+      role: 'Student',
+      roleColor: '#3b82f6',
+      department: 'Faculty of Business',
+      status: 'Inactive',
+      statusColor: '#94a3b8',
+      avatar: 'https://ui-avatars.com/api/?name=Thawatchai+Lee&background=3b82f6&color=fff'
+    },
+    {
+      id: 9,
+      name: 'Pennapa Chai',
+      email: 'pennapa.c@ku.th',
+      role: 'Staff',
+      roleColor: '#64748b',
+      department: 'Library Services',
+      status: 'Active',
+      statusColor: '#22c55e',
+      avatar: 'https://ui-avatars.com/api/?name=Pennapa+Chai&background=64748b&color=fff'
+    },
+    {
+      id: 10,
+      name: 'Suthep Wongsa',
+      email: 'suthep.w@ku.th',
+      role: 'Faculty',
+      roleColor: '#f59e0b',
+      department: 'Faculty of Law',
+      status: 'Active',
+      statusColor: '#22c55e',
+      avatar: 'https://ui-avatars.com/api/?name=Suthep+Wongsa&background=f59e0b&color=fff'
+    }
+  ];
+
+  const totalPages = 129;
+
+  // Handle select all checkbox
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(usersData.map(user => user.id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  // Handle individual checkbox
+  const handleSelectUser = (userId: number) => {
+    if (selectedUsers.includes(userId)) {
+      setSelectedUsers(selectedUsers.filter(id => id !== userId));
+      setSelectAll(false);
+    } else {
+      const newSelected = [...selectedUsers, userId];
+      setSelectedUsers(newSelected);
+      if (newSelected.length === usersData.length) {
+        setSelectAll(true);
+      }
+    }
+  };
+
+  // Handle new user form input
+  const handleNewUserInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewUserData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle form submission
+  const handleAddUserSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log('New User:', newUserData);
+    // TODO: Add API call to create user
+    setShowAddUserModal(false);
+    // Reset form
+    setNewUserData({
+      name: '',
+      email: '',
+      role: 'Student',
+      faculty: '',
+      department: '',
+      campus: 'Bangkhen'
+    });
+  };
+
+  // Handle Edit User
+  const handleEditUser = (user: User) => {
+    setSelectedUser({ ...user });
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = () => {
+    console.log('Updated User:', selectedUser);
+    // TODO: Add API call to update user
+    setShowEditModal(false);
+    setSelectedUser(null);
+  };
+
+  // Handle View History
+  const handleViewHistory = (user: User) => {
+    setSelectedUser(user);
+    setShowHistoryModal(true);
+  };
+
+  // Handle View Profile
+  const handleViewProfile = (user: User) => {
+    setSelectedUser(user);
+    setShowProfileModal(true);
+  };
+
+  return (
+    <div className="users-container">
+      {/* Page Header */}
+      <div className="users-header">
+        <div className="header-content">
+          <h1 className="page-title">User Management</h1>
+        </div>
+        <div className="header-actions">
+          <button className="btn btn-primary" onClick={() => setShowAddUserModal(true)}>
+            <span className="btn-icon"><UserPlus size={18} /></span>
+            Add New User
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="stats-grid">
+        {statsData.map((stat, index) => {
+          const StatIcon = stat.IconComponent
+          const iconColors = ['#22c55e', '#3b82f6', '#f59e0b']  // Green, Blue, Orange
+          return (
+            <div key={index} className="stat-card" style={{ animationDelay: `${index * 0.1}s` }}>
+              <div className="stat-icon-wrapper" style={{ background: stat.iconBg }}>
+                <span className="stat-icon">
+                  <StatIcon size={24} color={iconColors[index]} strokeWidth={2} />
+                </span>
+              </div>
+              <div className="stat-content">
+                <div className="stat-label">{stat.label}</div>
+                <div className="stat-value">{stat.value}</div>
+                <div className={`stat-change ${stat.changeType}`}>
+                  {stat.change}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Search and Filters */}
+      <div className="table-controls">
+        <div className="search-box">
+          <span className="search-icon"><Search size={18} /></span>
+          <input
+            type="text"
+            placeholder="Search by name, email or ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        <div className="filter-buttons">
+          <button 
+            className="filter-btn" 
+            title="Settings"
+            onClick={() => setShowSettingsModal(true)}
+          >
+            <span className="filter-icon"><SettingsIcon size={18} /></span>
+          </button>
+          <button 
+            className="filter-btn" 
+            title="Column Options"
+            onClick={() => setShowViewOptions(!showViewOptions)}
+          >
+            <span className="filter-icon"><Menu size={18} /></span>
+          </button>
+        </div>
+      </div>
+
+      {/* View Options Dropdown */}
+      {showViewOptions && (
+        <div className="view-options-dropdown">
+          <div className="dropdown-header">View Options</div>
+          <button className="dropdown-item active">
+            <span className="item-icon">📋</span>
+            Table View
+          </button>
+          <button className="dropdown-item">
+            <span className="item-icon">🔲</span>
+            Card View
+          </button>
+          <button className="dropdown-item">
+            <span className="item-icon">📏</span>
+            Compact View
+          </button>
+          <div className="dropdown-divider"></div>
+          <button className="dropdown-item">
+            <span className="item-icon">⬆️</span>
+            Sort by Name
+          </button>
+          <button className="dropdown-item">
+            <span className="item-icon">📅</span>
+            Sort by Date
+          </button>
+        </div>
+      )}
+
+      {/* Tabs */}
+      <div className="tabs-container">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            className={`tab ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Action Buttons Guide */}
+      <div className="action-guide">
+        <span className="guide-title">Action Buttons:</span>
+        <div className="guide-items">
+          <div className="guide-item">
+            <span className="guide-icon"><Edit size={18} /></span>
+            <span className="guide-text">Edit user information</span>
+          </div>
+          <div className="guide-item">
+            <span className="guide-icon"><History size={18} /></span>
+            <span className="guide-text">View activity history</span>
+          </div>
+          <div className="guide-item">
+            <span className="guide-icon"><UserIcon size={18} /></span>
+            <span className="guide-text">View full profile</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <div className="table-container">
+        <table className="users-table">
+          <thead>
+            <tr>
+              <th className="checkbox-col">
+                <input 
+                  type="checkbox" 
+                  checked={selectAll}
+                  onChange={handleSelectAll}
+                />
+              </th>
+              <th>USER DETAILS</th>
+              <th>ROLE</th>
+              <th>DEPARTMENT / FACULTY</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {usersData.map((user) => (
+              <tr key={user.id}>
+                <td className="checkbox-col">
+                  <input 
+                    type="checkbox"
+                    checked={selectedUsers.includes(user.id)}
+                    onChange={() => handleSelectUser(user.id)}
+                  />
+                </td>
+                <td>
+                  <div className="user-details">
+                    <img src={user.avatar} alt={user.name} className="user-avatar" />
+                    <div className="user-info">
+                      <div className="user-name">{user.name}</div>
+                      <div className="user-email">{user.email}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span className="role-badge" style={{ backgroundColor: `${user.roleColor}15`, color: user.roleColor }}>
+                    {user.role}
+                  </span>
+                </td>
+                <td className="department-col">{user.department}</td>
+                <td>
+                  <span className="status-badge" style={{ backgroundColor: `${user.statusColor}15`, color: user.statusColor }}>
+                    ● {user.status}
+                  </span>
+                </td>
+                <td>
+                  <div className="action-buttons">
+                    <button 
+                      className="action-btn edit-btn" 
+                      title="Edit User Information"
+                      onClick={() => handleEditUser(user)}
+                    >
+                      <Edit size={18} />
+                    </button>
+                    <button 
+                      className="action-btn history-btn" 
+                      title="View Activity History"
+                      onClick={() => handleViewHistory(user)}
+                    >
+                      <History size={18} />
+                    </button>
+                    <button 
+                      className="action-btn profile-btn" 
+                      title="View Full Profile"
+                      onClick={() => handleViewProfile(user)}
+                    >
+                      <UserIcon size={18} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="pagination">
+        <div className="pagination-info">
+          Showing 1 to 10 of 1,284 entries
+        </div>
+        <div className="pagination-controls">
+          <button className="pagination-btn" disabled>
+            Previous
+          </button>
+          <button className="pagination-btn active">1</button>
+          <button className="pagination-btn">2</button>
+          <button className="pagination-btn">3</button>
+          <span className="pagination-dots">...</span>
+          <button className="pagination-btn">129</button>
+          <button className="pagination-btn">Next</button>
+        </div>
+      </div>
+
+      {/* Add User Modal */}
+      {showAddUserModal && (
+        <div className="modal-overlay" onClick={() => setShowAddUserModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">Add New Student</h2>
+              <button className="modal-close" onClick={() => setShowAddUserModal(false)}><X size={20} /></button>
+            </div>
+
+            <form onSubmit={handleAddUserSubmit} className="user-form">
+              <div className="form-group">
+                <label className="form-label">Full Name *</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={newUserData.name}
+                  onChange={handleNewUserInputChange}
+                  className="form-input"
+                  placeholder="e.g., Somchai Rakdee"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Email Address *</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={newUserData.email}
+                  onChange={handleNewUserInputChange}
+                  className="form-input"
+                  placeholder="e.g., somchai@ku.th"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Role *</label>
+                <select
+                  name="role"
+                  value={newUserData.role}
+                  onChange={handleNewUserInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="Student">Student</option>
+                  <option value="Faculty">Faculty</option>
+                  <option value="Staff">Staff</option>
+                  <option value="Committee">Committee</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Faculty *</label>
+                <select
+                  name="faculty"
+                  value={newUserData.faculty || ''}
+                  onChange={handleNewUserInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select Faculty</option>
+                  <option value="Faculty of Engineering">Faculty of Engineering</option>
+                  <option value="Faculty of Science">Faculty of Science</option>
+                  <option value="Faculty of Agriculture">Faculty of Agriculture</option>
+                  <option value="Faculty of Architecture">Faculty of Architecture</option>
+                  <option value="Faculty of Business Administration">Faculty of Business Administration</option>
+                  <option value="Faculty of Economics">Faculty of Economics</option>
+                  <option value="Faculty of Education">Faculty of Education</option>
+                  <option value="Faculty of Fisheries">Faculty of Fisheries</option>
+                  <option value="Faculty of Forestry">Faculty of Forestry</option>
+                  <option value="Faculty of Humanities">Faculty of Humanities</option>
+                  <option value="Faculty of Liberal Arts">Faculty of Liberal Arts</option>
+                  <option value="Faculty of Medicine">Faculty of Medicine</option>
+                  <option value="Faculty of Social Sciences">Faculty of Social Sciences</option>
+                  <option value="Faculty of Sports Science">Faculty of Sports Science</option>
+                  <option value="Faculty of Veterinary Medicine">Faculty of Veterinary Medicine</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Department *</label>
+                <select
+                  name="department"
+                  value={newUserData.department || ''}
+                  onChange={handleNewUserInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select Department</option>
+                  <option value="Computer Engineering">Computer Engineering</option>
+                  <option value="Electrical Engineering">Electrical Engineering</option>
+                  <option value="Mechanical Engineering">Mechanical Engineering</option>
+                  <option value="Civil Engineering">Civil Engineering</option>
+                  <option value="Chemical Engineering">Chemical Engineering</option>
+                  <option value="Industrial Engineering">Industrial Engineering</option>
+                  <option value="Environmental Engineering">Environmental Engineering</option>
+                  <option value="Computer Science">Computer Science</option>
+                  <option value="Mathematics">Mathematics</option>
+                  <option value="Physics">Physics</option>
+                  <option value="Chemistry">Chemistry</option>
+                  <option value="Biology">Biology</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Campus *</label>
+                <select
+                  name="campus"
+                  value={newUserData.campus}
+                  onChange={handleNewUserInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="Bangkhen">Bangkhen Campus</option>
+                  <option value="Kamphaeng Saen">Kamphaeng Saen Campus</option>
+                  <option value="Chalermphrakiat Sakon Nakhon Province">Chalermphrakiat Sakon Nakhon Province Campus</option>
+                  <option value="Sriracha">Sriracha Campus</option>
+                </select>
+              </div>
+
+              <div className="form-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowAddUserModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  <span className="btn-icon"><Check size={16} /></span>
+                  Add Student
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">Edit User Information</h2>
+              <button className="modal-close" onClick={() => setShowEditModal(false)}><X size={20} /></button>
+            </div>
+
+            <div className="user-form">
+              <div className="form-group">
+                <label className="form-label">Full Name *</label>
+                <input
+                  type="text"
+                  value={selectedUser.name}
+                  onChange={(e) => setSelectedUser({...selectedUser, name: e.target.value})}
+                  className="form-input"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Email *</label>
+                <input
+                  type="email"
+                  value={selectedUser.email}
+                  onChange={(e) => setSelectedUser({...selectedUser, email: e.target.value})}
+                  className="form-input"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Role *</label>
+                <select
+                  value={selectedUser.role}
+                  onChange={(e) => setSelectedUser({...selectedUser, role: e.target.value})}
+                  className="form-select"
+                >
+                  <option value="Student">Student</option>
+                  <option value="Faculty">Faculty</option>
+                  <option value="Staff">Staff</option>
+                  <option value="Committee">Committee</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Faculty *</label>
+                <select
+                  value={selectedUser.faculty || selectedUser.department}
+                  onChange={(e) => setSelectedUser({...selectedUser, faculty: e.target.value})}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select Faculty</option>
+                  <option value="Faculty of Engineering">Faculty of Engineering</option>
+                  <option value="Faculty of Science">Faculty of Science</option>
+                  <option value="Faculty of Agriculture">Faculty of Agriculture</option>
+                  <option value="Faculty of Architecture">Faculty of Architecture</option>
+                  <option value="Faculty of Business Administration">Faculty of Business Administration</option>
+                  <option value="Faculty of Economics">Faculty of Economics</option>
+                  <option value="Faculty of Education">Faculty of Education</option>
+                  <option value="Faculty of Fisheries">Faculty of Fisheries</option>
+                  <option value="Faculty of Forestry">Faculty of Forestry</option>
+                  <option value="Faculty of Humanities">Faculty of Humanities</option>
+                  <option value="Faculty of Liberal Arts">Faculty of Liberal Arts</option>
+                  <option value="Faculty of Medicine">Faculty of Medicine</option>
+                  <option value="Faculty of Social Sciences">Faculty of Social Sciences</option>
+                  <option value="Faculty of Sports Science">Faculty of Sports Science</option>
+                  <option value="Faculty of Veterinary Medicine">Faculty of Veterinary Medicine</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Department *</label>
+                <select
+                  value={selectedUser.department || ''}
+                  onChange={(e) => setSelectedUser({...selectedUser, department: e.target.value})}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select Department</option>
+                  <option value="Computer Engineering">Computer Engineering</option>
+                  <option value="Electrical Engineering">Electrical Engineering</option>
+                  <option value="Mechanical Engineering">Mechanical Engineering</option>
+                  <option value="Civil Engineering">Civil Engineering</option>
+                  <option value="Chemical Engineering">Chemical Engineering</option>
+                  <option value="Industrial Engineering">Industrial Engineering</option>
+                  <option value="Environmental Engineering">Environmental Engineering</option>
+                  <option value="Computer Science">Computer Science</option>
+                  <option value="Mathematics">Mathematics</option>
+                  <option value="Physics">Physics</option>
+                  <option value="Chemistry">Chemistry</option>
+                  <option value="Biology">Biology</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Status *</label>
+                <select
+                  value={selectedUser.status}
+                  onChange={(e) => setSelectedUser({...selectedUser, status: e.target.value})}
+                  className="form-select"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div className="form-actions">
+                <button className="btn btn-secondary" onClick={() => setShowEditModal(false)}>
+                  Cancel
+                </button>
+                <button className="btn btn-primary" onClick={handleSaveEdit}>
+                  <span className="btn-icon"><Check size={16} /></span>
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* History Modal */}
+      {showHistoryModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowHistoryModal(false)}>
+          <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <h2 className="modal-title">Activity History</h2>
+                <p className="modal-subtitle">{selectedUser.name} ({selectedUser.email})</p>
+              </div>
+              <button className="modal-close" onClick={() => setShowHistoryModal(false)}><X size={20} /></button>
+            </div>
+
+            <div className="history-content">
+              <div className="history-timeline">
+                <div className="history-item">
+                  <div className="history-icon success"><Check size={16} /></div>
+                  <div className="history-details">
+                    <div className="history-title">Application Submitted</div>
+                    <div className="history-description">Submitted application for Academic Excellence Award</div>
+                    <div className="history-time">2 days ago - Jan 29, 2026 14:30</div>
+                  </div>
+                </div>
+
+                <div className="history-item">
+                  <div className="history-icon info">🔐</div>
+                  <div className="history-details">
+                    <div className="history-title">Login</div>
+                    <div className="history-description">Logged in from IP: 202.44.xxx.xxx</div>
+                    <div className="history-time">3 days ago - Jan 28, 2026 09:15</div>
+                  </div>
+                </div>
+
+                <div className="history-item">
+                  <div className="history-icon warning">⚠️</div>
+                  <div className="history-details">
+                    <div className="history-title">Status Changed</div>
+                    <div className="history-description">Status updated to Active by Admin</div>
+                    <div className="history-time">1 week ago - Jan 24, 2026 16:45</div>
+                  </div>
+                </div>
+
+                <div className="history-item">
+                  <div className="history-icon success"><UserIcon size={18} /></div>
+                  <div className="history-details">
+                    <div className="history-title">Account Created</div>
+                    <div className="history-description">User account created by System Admin</div>
+                    <div className="history-time">2 weeks ago - Jan 17, 2026 10:00</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Modal */}
+      {showProfileModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowProfileModal(false)}>
+          <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">User Profile</h2>
+              <button className="modal-close" onClick={() => setShowProfileModal(false)}><X size={20} /></button>
+            </div>
+
+            <div className="profile-content">
+              {/* Profile Header */}
+              <div className="profile-header">
+                <div className="profile-avatar">
+                  <img src={selectedUser.avatar} alt={selectedUser.name} />
+                </div>
+                <div className="profile-info">
+                  <h3 className="profile-name">{selectedUser.name}</h3>
+                  <p className="profile-email">{selectedUser.email}</p>
+                  <span className={`status-badge ${selectedUser.status.toLowerCase()}`}>
+                    {selectedUser.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Profile Details */}
+              <div className="profile-details">
+                <h4 className="section-title">Personal Information</h4>
+                <div className="details-grid">
+                  <div className="detail-item">
+                    <span className="detail-label">Role</span>
+                    <span className="detail-value">{selectedUser.role}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Department</span>
+                    <span className="detail-value">{selectedUser.department}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Status</span>
+                    <span className="detail-value">{selectedUser.status}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Joined Date</span>
+                    <span className="detail-value">Jan 17, 2026</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Applications Section */}
+              <div className="profile-section">
+                <h4 className="section-title">Recent Applications</h4>
+                <div className="applications-list">
+                  <div className="application-item">
+                    <span className="app-icon">🏆</span>
+                    <div className="app-details">
+                      <div className="app-name">Academic Excellence Award</div>
+                      <div className="app-status pending">Pending Review</div>
+                    </div>
+                    <div className="app-date">Jan 29, 2026</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettingsModal && (
+        <div className="modal-overlay" onClick={() => setShowSettingsModal(false)}>
+          <div className="modal-content settings-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">Table Settings</h2>
+              <button className="modal-close" onClick={() => setShowSettingsModal(false)}><X size={20} /></button>
+            </div>
+
+            <div className="settings-content">
+              <div className="settings-section">
+                <h3 className="settings-title">Visible Columns</h3>
+                <div className="checkbox-list">
+                  <label className="checkbox-item">
+                    <input type="checkbox" defaultChecked />
+                    <span>User Details</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" defaultChecked />
+                    <span>Role</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" defaultChecked />
+                    <span>Department / Faculty</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" defaultChecked />
+                    <span>Status</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" />
+                    <span>Last Login</span>
+                  </label>
+                  <label className="checkbox-item">
+                    <input type="checkbox" />
+                    <span>Created Date</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <h3 className="settings-title">Display Options</h3>
+                <div className="radio-list">
+                  <label className="radio-item">
+                    <input type="radio" name="rowsPerPage" defaultChecked />
+                    <span>10 rows per page</span>
+                  </label>
+                  <label className="radio-item">
+                    <input type="radio" name="rowsPerPage" />
+                    <span>25 rows per page</span>
+                  </label>
+                  <label className="radio-item">
+                    <input type="radio" name="rowsPerPage" />
+                    <span>50 rows per page</span>
+                  </label>
+                  <label className="radio-item">
+                    <input type="radio" name="rowsPerPage" />
+                    <span>100 rows per page</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-actions">
+              <button className="btn btn-secondary" onClick={() => setShowSettingsModal(false)}>
+                Cancel
+              </button>
+              <button className="btn btn-primary" onClick={() => setShowSettingsModal(false)}>
+                <span className="btn-icon"><Check size={16} /></span>
+                Apply Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
