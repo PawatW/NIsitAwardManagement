@@ -1,17 +1,13 @@
 import api from "../../../lib/axios";
 
-export const login = (email: string, password: string) => {
-  return api.post("/auth/login", { email, password });
+export const getGoogleAuthUrl = () => {
+  return api.get("/api/v1/auth/google");
 };
 
 export const register = (data: any) => {
-  return api.post("/auth/register", data);
-};
-
-export const logout = () => {
-  return api.post("/auth/logout");
+  return api.post("/api/v1/user/register", data);
 };
 
 export const getMe = () => {
-  return api.get("/auth/me");
+  return api.get("/api/v1/user/me");
 };
