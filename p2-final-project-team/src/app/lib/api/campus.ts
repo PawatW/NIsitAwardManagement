@@ -1,21 +1,13 @@
 import api from "../../../lib/axios";
 
 export const getCampuses = () => {
-  return api.get("/campuses");
+  return api.get("/api/v1/organization/campuses");
 };
 
-export const getCampus = (id: number) => {
-  return api.get(`/campuses/${id}`);
+export const getFacultiesByCampus = (campusId: string) => {
+  return api.get(`/api/v1/organization/campuses/${campusId}/faculties`);
 };
 
-export const createCampus = (data: any) => {
-  return api.post("/campuses", data);
-};
-
-export const updateCampus = (id: number, data: any) => {
-  return api.put(`/campuses/${id}`, data);
-};
-
-export const deleteCampus = (id: number) => {
-  return api.delete(`/campuses/${id}`);
+export const getDepartmentsByFaculty = (facultyId: string) => {
+  return api.get(`/api/v1/organization/faculties/${facultyId}/departments`);
 };

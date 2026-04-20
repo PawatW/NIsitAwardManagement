@@ -1,21 +1,9 @@
 import api from "../../../lib/axios";
 
-export const getDepartments = () => {
-  return api.get("/departments");
-};
-
-export const getDepartment = (id: number) => {
-  return api.get(`/departments/${id}`);
+export const getDepartmentsByFaculty = (facultyId: string) => {
+  return api.get(`/api/v1/organization/faculties/${facultyId}/departments`);
 };
 
 export const createDepartment = (data: any) => {
-  return api.post("/departments", data);
-};
-
-export const updateDepartment = (id: number, data: any) => {
-  return api.put(`/departments/${id}`, data);
-};
-
-export const deleteDepartment = (id: number) => {
-  return api.delete(`/departments/${id}`);
+  return api.post("/api/v1/admin/departments", data);
 };

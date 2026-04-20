@@ -1,46 +1,25 @@
 import api from "../../../lib/axios";
 
-// ดึงรายการใบสมัครทั้งหมด
 export const getApplications = (params?: any) => {
-  return api.get("/api/v1/applications", { params });
+  return api.get("/api/v1/requests", { params });
 };
 
-// ดึงใบสมัครตาม ID
-export const getApplication = (id: number) => {
-  return api.get(`/api/v1/applications/${id}`);
+export const getApplication = (id: string) => {
+  return api.get(`/api/v1/requests/${id}`);
 };
 
-// ดึงสถิติ Dashboard
-export const getApplicationStats = () => {
-  return api.get("/api/v1/applications/stats");
+export const getMyApplications = () => {
+  return api.get("/api/v1/requests/my");
 };
 
-// ดึงใบสมัครที่รอพิจารณา
-export const getPendingApplications = () => {
-  return api.get("/api/v1/applications?status=pending");
+export const getApplicationsByStatus = (status: string, params?: any) => {
+  return api.get(`/api/v1/requests/status/${status}`, { params });
 };
 
-// ดึงใบสมัครที่อนุมัติแล้ว
-export const getApprovedApplications = () => {
-  return api.get("/api/v1/applications?status=approved");
+export const approveApplication = (id: string, data?: any) => {
+  return api.post(`/api/v1/requests/${id}/approve`, data);
 };
 
-// ดึงใบสมัครที่ส่งกลับแก้ไข
-export const getRejectedApplications = () => {
-  return api.get("/api/v1/applications?status=rejected");
-};
-
-// อัพเดทสถานะใบสมัคร
-export const updateApplicationStatus = (id: number, status: string, notes?: string) => {
-  return api.patch(`/api/v1/applications/${id}/status`, { status, notes });
-};
-
-// ส่งต่อให้คณะกรรมการ
-export const forwardToCommittee = (id: number) => {
-  return api.post(`/api/v1/applications/${id}/forward`);
-};
-
-// ประกาศผลอย่างเป็นทางการ
-export const publishResults = () => {
-  return api.post("/api/v1/applications/publish");
+export const rejectApplication = (id: string, data?: any) => {
+  return api.post(`/api/v1/requests/${id}/reject`, data);
 };
